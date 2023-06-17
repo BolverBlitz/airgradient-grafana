@@ -4,6 +4,7 @@
       "module": "commonjs",
       "paths": {
         "@lib/*": ["./lib/*"],
+        "@middleware/*": ["./middleware/*"],
       }
     },
     "exclude": ["node_modules"]

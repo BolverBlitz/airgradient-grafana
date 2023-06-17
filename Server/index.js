@@ -12,6 +12,8 @@ process.log = log;
 const HyperExpress = require('hyper-express');
 const Joi = require('joi');
 
+const { isAllowed } = require('@middleware/deviceCheck');
+
 const app = new HyperExpress.Server({
     fast_buffers: process.env.HE_fast_buffers == 'false' ? false : true || false,
 });
@@ -26,11 +28,24 @@ const airgradientSensor = Joi.object({
     rhum: Joi.number().min(0).max(200).required(),
 });
 
-app.post('/sensors/airgradient/:chipID', async (req, res) => {
-    const value = await airgradientSensor.validateAsync(await req.json());
-    await writeDatapoint('airgradient', value, req.params.chipID);
-    res.send('ok');
-    res.status(200);
+app.post('/sensors/airgradient/:chipID', isAllowed(),  async (req, res) => {
+    try {
+        const value = await airgradientSensor.validateAsync(await req.json());
+        await writeDatapoint('airgradient', value, req.params.chipID);
+        res.send('ok');
+        res.status(200);
+    } catch (error) {
+        res.status(500);
+        return (error);
+    }
+});
+
+/* Handlers */
+app.set_error_handler((req, res, error) => {
+    res.status(500);
+    res.json({
+        message: error.message,
+    });
 });
 
 
