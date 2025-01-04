@@ -1,3 +1,7 @@
-
 Server/node_modules/*
 Server/.env
+*.DS_Store
+build
+.vscode
+/.idea/
+.pio
